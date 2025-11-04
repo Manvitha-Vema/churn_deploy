@@ -4,5 +4,5 @@ services:
     env: python
     runtime: python-3.11.9
     buildCommand: pip install -r requirements.txt
-    startCommand: python churn.py Telco_customer_churn.csv --min_features 5
+    startCommand: python churn.py sample.csv --min_features 5
     plan: starter
