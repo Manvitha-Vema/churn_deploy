@@ -1,6 +1,6 @@
 services:
   - type: web
     name: churn-predictor
-    env: python
+    env: docker
     dockerfilePath: ./Dockerfile
     plan: starter
