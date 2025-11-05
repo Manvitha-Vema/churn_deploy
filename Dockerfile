@@ -11,8 +11,9 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ---------- 5️⃣  Expose the web port ----------
-EXPOSE 10000
+# ---------- 5️⃣  Expose the PORT dynamically ----------
+# Railway injects the PORT environment variable automatically
+EXPOSE $PORT
 
-# ---------- 6️⃣  Start Flask with gunicorn ----------
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+# ---------- 6️⃣  Start Flask with Gunicorn (using dynamic PORT) ----------
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:$PORT"]
