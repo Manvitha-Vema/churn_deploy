@@ -1,21 +1,18 @@
-# Force Python 3.11 base
+# ---------- 1️⃣  Use a stable Python base image ----------
 FROM python:3.11-slim
 
-# Set working directory
+# ---------- 2️⃣  Set working directory ----------
 WORKDIR /app
 
-# Copy dependency files
-COPY requirements.txt .
-COPY churn.py .
-COPY sample.csv .
-COPY runtime.txt .
-COPY render.yaml .
+# ---------- 3️⃣  Copy your files ----------
+COPY . .
 
-# Install system build tools (for XGBoost/SHAP)
-RUN apt-get update && apt-get install -y build-essential
+# ---------- 4️⃣  Install dependencies ----------
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# ---------- 5️⃣  Expose the web port ----------
+EXPOSE 10000
 
-# Start command
-CMD ["python", "churn.py", "sample.csv", "--min_features", "5"]
+# ---------- 6️⃣  Start Flask with gunicorn ----------
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
