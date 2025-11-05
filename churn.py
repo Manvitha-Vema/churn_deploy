@@ -178,6 +178,66 @@ def prepare_data(df, balance=True):
 
     return X, y, le_dict, target_col
 
+# def preprocess_for_prediction(df):
+#     """Preprocess input data for prediction (no target column)."""
+
+#     df.columns = [c.strip().replace(" ", "").replace("-", "").lower() for c in df.columns]
+
+#     # ✅ Rename all known variations to the expected training names
+#     rename_map = {
+#         "gender": "Gender",
+#         "seniorcitizen": "Senior Citizen",
+#         "tenuremonths": "Tenure Months",
+#         "phoneservice": "Phone Service",
+#         "multiplelines": "Multiple Lines",
+#         "internetservice": "Internet Service",
+#         "onlinesecurity": "Online Security",
+#         "onlinebackup": "Online Backup",
+#         "deviceprotection": "Device Protection",
+#         "techsupport": "Tech Support",
+#         "streamingtv": "Streaming TV",
+#         "streamingmovies": "Streaming Movies",
+#         "paperlessbilling": "Paperless Billing",
+#         "paymentmethod": "Payment Method",
+#         "monthlycharges": "Monthly Charges",
+#         "totalcharges": "Total Charges",
+#         "latitude": "Latitude",
+#         "longitude": "Longitude",
+#         "cltv": "CLTV",
+#         "churnlabel": "Churn Label",
+#         "churnvalue": "Churn Value",
+#         "churnreason": "Churn Reason"
+#     }
+
+#     df.rename(columns=rename_map, inplace=True)
+
+#     # Drop irrelevant columns not used in prediction
+#     df.drop(columns=[c for c in df.columns if 'churn' in c.lower() or 'customerid' in c.lower()], errors='ignore')
+#     df, dropped = drop_uninformative_columns(df, missing_thresh=0.5)
+#     df = convert_dates_and_numbers(df)
+#     df = df.loc[:, df.nunique(dropna=False) > 1]
+
+#     # Encode categorical columns
+#     X, _ = encode_categoricals(df)
+
+#     # Fill missing numeric values
+#     for c in X.columns:
+#         if X[c].isnull().any():
+#             if X[c].dtype.kind in 'biufc':
+#                 X[c] = X[c].fillna(X[c].median())
+#             else:
+#                 X[c] = X[c].fillna(-1)
+
+#     # Optional engineered ratios
+#     if "MonthlyCharges" in X.columns and "tenure" in X.columns:
+#         X["MonthlyChargePerTenure"] = X["MonthlyCharges"] / (X["tenure"] + 1)
+#     if "TotalCharges" in X.columns and "tenure" in X.columns:
+#         X["TotalChargesPerTenure"] = X["TotalCharges"] / (X["tenure"] + 1)
+
+#     return X
+
+
+
 
 def fit_xgb(X_train, y_train, X_valid=None, y_valid=None, random_state=42):
     pos = (y_train == 1).sum()
@@ -272,7 +332,7 @@ def shap_recursive_feature_elimination(X_train, y_train, X_test, y_test,
     return best_features, scores
 
 
-def run_pipeline(data, test_size=0.2, random_state=42, min_features=5, show_plots=False):
+def run_pipeline(data, test_size=0.2, random_state=42, min_features=5, show_plots=True):
     """
     Accepts:
     - data: CSV file path OR pandas DataFrame
@@ -386,6 +446,7 @@ if __name__ == "__main__":
     X, y, _, _ = prepare_data(pd.read_csv(args.csv))
     xgb_final = fit_xgb(X, y)
     joblib.dump(xgb_final, "xgb_churn_model.joblib")
+    joblib.dump(results["best_features"], "best_features.joblib")
     print(f" Model saved successfully as {os.path.abspath('xgb_churn_model.joblib')}")
 
     print("\nDone.")
