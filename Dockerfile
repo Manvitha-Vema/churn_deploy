@@ -12,6 +12,7 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ---------- 5️⃣  Expose the dynamic Railway port ----------
+ENV PORT=8000
 EXPOSE $PORT
 
 # ---------- 6️⃣  Start Flask with Gunicorn using dynamic port ----------
